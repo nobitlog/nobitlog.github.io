@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jay Payot — Developer & Creative</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --fg: #f0ede8;
+    --muted: #5a5755;
+    --accent: #c8f57e;
+    --accent2: #f5c87e;
+    --line: rgba(255,255,255,0.12);
+  }
+ 
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+ 
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+ 
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.35;
+  }
+ 
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+ 
+  /* NAV — centered */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 24px 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(14,14,14,0.95) 0%, transparent 100%);
+  }
+ 
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+ 
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+ 
+  .nav-links a:hover { color: var(--fg); }
+ 
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 120px 32px 80px;
+    position: relative;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+ 
+  .hero-inner { width: 100%; }
+ 
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+ 
+  .hero-eyebrow span {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+ 
+ 
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+ 
+  .hero-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(52px, 9vw, 96px);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+ 
+  .hero-name em {
+    font-style: italic;
+    color: var(--accent);
+  }
+ 
+  .hero-desc {
+    max-width: 480px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.8;
+    margin-bottom: 56px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+ 
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+ 
+  .tag {
+    padding: 6px 14px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 2px;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: #fff;
+    transition: color 0.3s, border-color 0.3s;
+  }
+ 
+  .tag:hover {
+    border-color: rgba(255,255,255,0.45);
+  }
+ 
+  .tag.accent {
+    color: var(--accent);
+    border-color: rgba(200, 245, 126, 0.35);
+  }
+ 
+  .scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards;
+  }
+ 
+  .scroll-line {
+    width: 40px;
+    height: 1px;
+    background: var(--muted);
+    position: relative;
+    overflow: hidden;
+  }
+ 
+  .scroll-line::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: var(--accent);
+    animation: scrollLine 2s 2s infinite;
+  }
+ 
+  @keyframes scrollLine {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+ 
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+ 
+  /* Sections */
+  section { padding: 100px 0; }
+ 
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 64px;
+  }
+ 
+  .section-num {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+ 
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+  }
+ 
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.12);
+  }
+ 
+  /* Projects */
+  .projects-list { display: flex; flex-direction: column; }
+ 
+  .project-item {
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    gap: 24px;
+    align-items: start;
+    padding: 32px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    text-decoration: none;
+    color: inherit;
+    transition: padding-left 0.3s;
+  }
+ 
+  .project-item:first-child { border-top: 1px solid rgba(255,255,255,0.12); }
+  .project-item:hover { padding-left: 12px; }
+ 
+  .project-num {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    padding-top: 4px;
+  }
+ 
+  .project-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+    transition: color 0.3s;
+    color: #fff;
+  }
+ 
+  .project-item:hover .project-name { color: var(--accent); }
+ 
+  .project-desc {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+    max-width: 520px;
+  }
+ 
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+  }
+ 
+  .p-tag {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+ 
+  .project-arrow {
+    font-size: 20px;
+    color: var(--muted);
+    padding-top: 4px;
+    transition: color 0.3s, transform 0.3s;
+  }
+ 
+  .project-item:hover .project-arrow {
+    color: var(--accent);
+    transform: translate(4px, -4px);
+  }
+ 
+  /* Stack — two columns: Frontend / Backend */
+  .stack-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+ 
+  .stack-col-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+  }
+ 
+  .stack-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+ 
+  .stack-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    transition: padding-left 0.25s;
+  }
+ 
+  .stack-item:hover { padding-left: 8px; }
+ 
+  .stack-item-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+ 
+  .stack-item-role {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+ 
+  /* Creative — two sub-sections */
+  .creative-subsection { margin-bottom: 56px; }
+  .creative-subsection:last-child { margin-bottom: 0; }
+ 
+  .creative-sublabel {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+ 
+  .creative-sublabel::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+  }
+ 
+  .creative-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+ 
+  .creative-grid-music {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+ 
+  .creative-card {
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+ 
+  .creative-card:hover { border-color: rgba(255,255,255,0.4); }
+ 
+  .creative-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--accent);
+    transition: height 0.4s ease;
+  }
+ 
+  .creative-card:hover::before { height: 100%; }
+ 
+  .creative-type {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+ 
+  .creative-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    color: #fff;
+  }
+ 
+  .creative-sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+ 
+  .music-card {
+    border-color: rgba(200,245,126,0.2);
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+ 
+  .music-card .creative-type { color: var(--accent); }
+ 
+  .music-icon {
+    font-size: 32px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+ 
+  .music-card:hover { border-color: rgba(200,245,126,0.5); }
+ 
+  /* About */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+ 
+  .about-text p {
+    color: var(--muted);
+    margin-bottom: 20px;
+    line-height: 1.9;
+  }
+ 
+  .about-text p strong { color: #fff; font-weight: 400; }
+ 
+  .about-facts { display: flex; flex-direction: column; }
+ 
+  .fact-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+ 
+  .fact-row:first-child { border-top: 1px solid rgba(255,255,255,0.1); }
+ 
+  .fact-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+ 
+  .fact-val {
+    font-size: 13px;
+    text-align: right;
+    max-width: 180px;
+    color: #fff;
+  }
+ 
+  /* Contact */
+  .contact-area {
+    text-align: center;
+    padding: 120px 0;
+  }
+ 
+  .contact-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+ 
+  .contact-big {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(40px, 7vw, 72px);
+    letter-spacing: -0.03em;
+    margin-bottom: 40px;
+    line-height: 1.1;
+    color: #fff;
+  }
+ 
+  .contact-big em {
+    font-style: italic;
+    color: var(--accent);
+  }
+ 
+  .contact-links {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+ 
+  .contact-link {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+ 
+  .contact-link:hover { color: #fff; }
+  .contact-link::before { content: '↗'; font-size: 12px; }
+ 
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--muted);
+    font-size: 11px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+ 
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+ 
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+ 
+  @media (max-width: 640px) {
+    .stack-wrapper { grid-template-columns: 1fr; gap: 40px; }
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    .creative-grid { grid-template-columns: 1fr; }
+    .project-item { grid-template-columns: 32px 1fr auto; gap: 12px; }
+    nav { padding: 20px; }
+    .nav-links { gap: 20px; }
+    .hero { padding: 100px 20px 60px; }
+    .container { padding: 0 20px; }
+    footer { padding: 24px 20px; flex-direction: column; gap: 12px; text-align: center; }
+    .music-card { flex-direction: column; align-items: flex-start; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+ 
+<nav>
+  <ul class="nav-links">
+    <li><a href="#work">Work</a></li>
+    <li><a href="#stack">Stack</a></li>
+    <li><a href="#creative">Creative</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+ 
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <div class="status-dot"></div>
+      <span>Available for collaboration</span>
+    </div>
+    <h1 class="hero-name">Novie<br><em>Jay</em> Payot</h1>
+    <p class="hero-desc">
+      2nd year IT student from DNSC, Panabo City. I build things for the web, capture moments through a lens, and express through music.
+    </p>
+    <div class="hero-tags">
+      <span class="tag accent">Developer</span>
+      <span class="tag">Multimedia</span>
+      <span class="tag">Musician</span>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</div>
+ 
+<!-- WORK -->
+<section id="work">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Dev Projects</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="projects-list reveal">
+ 
+      <div class="project-item">
+        <span class="project-num">01</span>
+        <div class="project-info">
+          <h3 class="project-name">Panabo Voting System</h3>
+          <p class="project-desc">A digital voting platform built for Panabo City. Developed as part of a team to streamline local electoral processes securely and efficiently.</p>
+          <div class="project-tags">
+            <span class="p-tag">Java</span>
+          </div>
+        </div>
+        <span class="project-arrow">↗</span>
+      </div>
+ 
+      <div class="project-item">
+        <span class="project-num">02</span>
+        <div class="project-info">
+          <h3 class="project-name">GoHike</h3>
+          <p class="project-desc">Hiking Trail Management and Booking Platform for Environmental Conservation in the Philippines. Connects hikers with trails while promoting eco-awareness.</p>
+          <div class="project-tags">
+            <span class="p-tag">HTML</span>
+            <span class="p-tag">PHP</span>
+            <span class="p-tag">JavaScript</span>
+          </div>
+        </div>
+        <span class="project-arrow">↗</span>
+      </div>
+ 
+      <div class="project-item">
+        <span class="project-num">03</span>
+        <div class="project-info">
+          <h3 class="project-name">SafeSpace</h3>
+          <p class="project-desc">Student Bullying Report & Case Management System — a safe, anonymous platform empowering students to report bullying incidents within their school environment.</p>
+          <div class="project-tags">
+            <span class="p-tag">Java</span>
+          </div>
+        </div>
+        <span class="project-arrow">↗</span>
+      </div>
+ 
+    </div>
+  </div>
+</section>
+ 
+<!-- STACK -->
+<section id="stack">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Stack</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="stack-wrapper reveal">
+ 
+      <!-- Frontend -->
+      <div class="stack-col">
+        <div class="stack-col-label">Frontend</div>
+        <div class="stack-items">
+          <div class="stack-item">
+            <span class="stack-item-name">HTML</span>
+            <span class="stack-item-role">Markup</span>
+          </div>
+          <div class="stack-item">
+            <span class="stack-item-name">CSS</span>
+            <span class="stack-item-role">Style</span>
+          </div>
+          <div class="stack-item">
+            <span class="stack-item-name">JavaScript</span>
+            <span class="stack-item-role">Scripting</span>
+          </div>
+          <div class="stack-item">
+            <span class="stack-item-name">Bootstrap</span>
+            <span class="stack-item-role">Framework</span>
+          </div>
+        </div>
+      </div>
+ 
+      <!-- Backend -->
+      <div class="stack-col">
+        <div class="stack-col-label">Backend</div>
+        <div class="stack-items">
+          <div class="stack-item">
+            <span class="stack-item-name">PHP</span>
+            <span class="stack-item-role">Server-side</span>
+          </div>
+          <div class="stack-item">
+            <span class="stack-item-name">Java</span>
+            <span class="stack-item-role">Language</span>
+          </div>
+        </div>
+      </div>
+ 
+    </div>
+  </div>
+</section>
+ 
+<!-- CREATIVE -->
+<section id="creative">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Creative Work</h2>
+      <div class="section-line"></div>
+    </div>
+ 
+    <!-- Multimedia -->
+    <div class="creative-subsection reveal">
+      <div class="creative-sublabel">Multimedia</div>
+      <div class="creative-grid">
+        <div class="creative-card">
+          <div class="creative-type">Film · Wedding</div>
+          <div class="creative-title">Ian & Anabelle's Wedding</div>
+          <div class="creative-sub">Full wedding videography</div>
+        </div>
+        <div class="creative-card">
+          <div class="creative-type">Film · Trailer</div>
+          <div class="creative-title">DAMA</div>
+          <div class="creative-sub">School trailer film production</div>
+        </div>
+        <div class="creative-card">
+          <div class="creative-type">Film · Montage</div>
+          <div class="creative-title">LAYA Booth</div>
+          <div class="creative-sub">Booth montage highlight reel</div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Musician -->
+    <div class="creative-subsection reveal">
+      <div class="creative-sublabel">Musician</div>
+      <div class="creative-grid-music">
+        <a href="https://www.youtube.com/@Basic.chords" target="_blank" class="creative-card music-card">
+          <div class="music-icon">♪</div>
+          <div>
+            <div class="creative-type">▶ YouTube · Guitar Covers</div>
+            <div class="creative-title">Basic Chords</div>
+            <div class="creative-sub">@Basic.chords — learning songs, sharing the journey</div>
+          </div>
+        </a>
+      </div>
+    </div>
+ 
+  </div>
+</section>
+ 
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-num">04</span>
+      <h2 class="section-title">About</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="about-grid reveal">
+      <div class="about-text">
+        <p>I'm <strong>Novie Jay Payot</strong> — a developer and creative from Panabo City, Davao del Norte. Currently a 2nd year IT student at <strong>Davao del Norte State College</strong>.</p>
+        <p>I don't just write code — I also shoot videos, take photos, edit content, and play music. I believe the best projects live at the intersection of <strong>technology and creativity</strong>.</p>
+        <p>I'm the kind of person who asks <em>why</em> and then goes off to find out. Naturally inquisitive, always learning.</p>
+      </div>
+      <div class="about-facts">
+        <div class="fact-row">
+          <span class="fact-label">Location</span>
+          <span class="fact-val">Panabo City, Davao del Norte</span>
+        </div>
+        <div class="fact-row">
+          <span class="fact-label">School</span>
+          <span class="fact-val">DNSC</span>
+        </div>
+        <div class="fact-row">
+          <span class="fact-label">Year</span>
+          <span class="fact-val">2nd Year IT</span>
+        </div>
+        <div class="fact-row">
+          <span class="fact-label">Roles</span>
+          <span class="fact-val">Dev · Videographer · Photographer · Musician</span>
+        </div>
+        <div class="fact-row">
+          <span class="fact-label">YouTube</span>
+          <span class="fact-val">@Basic.chords</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-area reveal">
+      <p class="contact-label">Get in touch</p>
+      <h2 class="contact-big">Let's build<br>something <em>real.</em></h2>
+      <div class="contact-links">
+        <a href="https://www.youtube.com/@Basic.chords" target="_blank" class="contact-link">YouTube</a>
+        <a href="mailto:jay@example.com" class="contact-link">Email</a>
+        <a href="https://github.com/" target="_blank" class="contact-link">GitHub</a>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<footer>
+  <span>© 2025 Novie Jay Payot</span>
+  <span>Panabo City, Philippines</span>
+</footer>
+ 
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
